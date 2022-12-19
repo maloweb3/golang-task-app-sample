@@ -2,6 +2,7 @@ package main
 
 import (
 	"app/db/repository"
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -12,7 +13,8 @@ func main() {
 		taskId := r.URL.Path[len("/tasks/"):]
 		log.Println("taskId:", taskId)
 
-		task, err := repository.GetTask(taskId)
+		ctx := context.Background()
+		task, err := repository.GetTask(ctx, taskId)
 		if err != nil {
 			return
 		}

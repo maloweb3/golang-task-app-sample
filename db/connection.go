@@ -24,10 +24,5 @@ func Connect() (*sql.DB, error) {
 		return nil, err
 	}
 
-	if err := db.Ping(); err != nil {
-		// エラー処理
-		log.Println("not success", err)
-	}
-
 	return db, nil
 }
