@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS tasks(
-   id serial PRIMARY KEY,
-   name VARCHAR (50),
-   description VARCHAR (300),
+   id serial PRIMARY KEY NOT NULL,
+   name VARCHAR NOT NULL,
+   description VARCHAR,
    end_date DATE,
-   status VARCHAR (50), 
-   priority VARCHAR (50),
-   created_at TIMESTAMP,
-   updated_at TIMESTAMP
+   status VARCHAR, 
+   priority INTEGER,
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

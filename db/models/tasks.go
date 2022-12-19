@@ -25,13 +25,13 @@ import (
 // Task is an object representing the database table.
 type Task struct {
 	ID          int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name        null.String `boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
+	Name        string      `boil:"name" json:"name" toml:"name" yaml:"name"`
 	Description null.String `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
 	EndDate     null.Time   `boil:"end_date" json:"end_date,omitempty" toml:"end_date" yaml:"end_date,omitempty"`
 	Status      null.String `boil:"status" json:"status,omitempty" toml:"status" yaml:"status,omitempty"`
-	Priority    null.String `boil:"priority" json:"priority,omitempty" toml:"priority" yaml:"priority,omitempty"`
-	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	Priority    null.Int    `boil:"priority" json:"priority,omitempty" toml:"priority" yaml:"priority,omitempty"`
+	CreatedAt   time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt   time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *taskR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L taskL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -102,6 +102,29 @@ func (w whereHelperint) NIN(slice []int) qm.QueryMod {
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
+type whereHelperstring struct{ field string }
+
+func (w whereHelperstring) EQ(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperstring) NEQ(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperstring) LT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperstring) LTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperstring) GT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperstring) GTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperstring) IN(slice []string) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperstring) NIN(slice []string) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
 type whereHelpernull_String struct{ field string }
 
 func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
@@ -164,24 +187,83 @@ func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
 func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
+type whereHelpernull_Int struct{ field string }
+
+func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelpernull_Int) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelpernull_Int) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
+type whereHelpertime_Time struct{ field string }
+
+func (w whereHelpertime_Time) EQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.EQ, x)
+}
+func (w whereHelpertime_Time) NEQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+}
+func (w whereHelpertime_Time) LT(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpertime_Time) LTE(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpertime_Time) GT(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
 var TaskWhere = struct {
 	ID          whereHelperint
-	Name        whereHelpernull_String
+	Name        whereHelperstring
 	Description whereHelpernull_String
 	EndDate     whereHelpernull_Time
 	Status      whereHelpernull_String
-	Priority    whereHelpernull_String
-	CreatedAt   whereHelpernull_Time
-	UpdatedAt   whereHelpernull_Time
+	Priority    whereHelpernull_Int
+	CreatedAt   whereHelpertime_Time
+	UpdatedAt   whereHelpertime_Time
 }{
 	ID:          whereHelperint{field: "\"tasks\".\"id\""},
-	Name:        whereHelpernull_String{field: "\"tasks\".\"name\""},
+	Name:        whereHelperstring{field: "\"tasks\".\"name\""},
 	Description: whereHelpernull_String{field: "\"tasks\".\"description\""},
 	EndDate:     whereHelpernull_Time{field: "\"tasks\".\"end_date\""},
 	Status:      whereHelpernull_String{field: "\"tasks\".\"status\""},
-	Priority:    whereHelpernull_String{field: "\"tasks\".\"priority\""},
-	CreatedAt:   whereHelpernull_Time{field: "\"tasks\".\"created_at\""},
-	UpdatedAt:   whereHelpernull_Time{field: "\"tasks\".\"updated_at\""},
+	Priority:    whereHelpernull_Int{field: "\"tasks\".\"priority\""},
+	CreatedAt:   whereHelpertime_Time{field: "\"tasks\".\"created_at\""},
+	UpdatedAt:   whereHelpertime_Time{field: "\"tasks\".\"updated_at\""},
 }
 
 // TaskRels is where relationship names are stored.
@@ -202,8 +284,8 @@ type taskL struct{}
 
 var (
 	taskAllColumns            = []string{"id", "name", "description", "end_date", "status", "priority", "created_at", "updated_at"}
-	taskColumnsWithoutDefault = []string{}
-	taskColumnsWithDefault    = []string{"id", "name", "description", "end_date", "status", "priority", "created_at", "updated_at"}
+	taskColumnsWithoutDefault = []string{"name"}
+	taskColumnsWithDefault    = []string{"id", "description", "end_date", "status", "priority", "created_at", "updated_at"}
 	taskPrimaryKeyColumns     = []string{"id"}
 	taskGeneratedColumns      = []string{}
 )
@@ -538,11 +620,11 @@ func (o *Task) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
-		if queries.MustTime(o.UpdatedAt).IsZero() {
-			queries.SetScanner(&o.UpdatedAt, currTime)
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
 		}
 	}
 
@@ -623,7 +705,7 @@ func (o *Task) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		queries.SetScanner(&o.UpdatedAt, currTime)
+		o.UpdatedAt = currTime
 	}
 
 	var err error
@@ -759,10 +841,10 @@ func (o *Task) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnCo
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
-		queries.SetScanner(&o.UpdatedAt, currTime)
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
