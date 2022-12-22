@@ -6,15 +6,19 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func main() {
 	http.HandleFunc("/tasks/", func(w http.ResponseWriter, r *http.Request) {
 		taskId := r.URL.Path[len("/tasks/"):]
-		log.Println("taskId:", taskId)
+		taskIdInt, err := strconv.Atoi(taskId)
+		if err != nil {
+			return
+		}
 
 		ctx := context.Background()
-		task, err := repository.GetTask(ctx, taskId)
+		task, err := repository.GetTask(ctx, taskIdInt)
 		if err != nil {
 			return
 		}
