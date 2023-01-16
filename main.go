@@ -1,32 +1,23 @@
 package main
 
 import (
-	"app/db/repository"
-	"context"
-	"encoding/json"
-	"log"
+	"app/controller"
 	"net/http"
-	"strconv"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {
-	http.HandleFunc("/tasks/", func(w http.ResponseWriter, r *http.Request) {
-		taskId := r.URL.Path[len("/tasks/"):]
-		taskIdInt, err := strconv.Atoi(taskId)
-		if err != nil {
-			return
-		}
-
-		ctx := context.Background()
-		task, err := repository.GetTask(ctx, taskIdInt)
-		if err != nil {
-			return
-		}
-		log.Println("task:", task)
-
-		w.WriteHeader(http.StatusOK)
-		response := map[string]string{"message": "ok"}
-		json.NewEncoder(w).Encode(response)
+	// Create Router
+	r := chi.NewRouter()
+	r.Route("/tasks", func(r chi.Router) {
+		r.Get("/", controller.GetTasks)
+		r.Get("/{taskID}", controller.GetTask)
+		r.Post("/", controller.CreateTask)
+		r.Patch("/{taskID}", controller.UpdateTask)
+		r.Delete("/{taskID}", controller.DeleteTask)
 	})
-	http.ListenAndServe(":8080", nil)
+
+	// Start HTTP server.
+	http.ListenAndServe(":8080", r)
 }
